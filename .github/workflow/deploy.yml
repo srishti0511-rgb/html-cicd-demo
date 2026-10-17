@@ -1,0 +1,68 @@
+name: HTML CI CD Pipeline
+on:
+push:
+branches:
+- main
+workflow_dispatch:
+permissions:
+contents: read
+pages: write
+id-token: write
+jobs:
+test:
+name: CI - Validate HTML
+
+Experiment 2 | Page 2
+
+runs-on: ubuntu-latest
+steps:
+- name: Checkout Code
+uses: actions/checkout@v4
+- name: Check HTML File
+run: test -f index.html
+- name: Validate HTML Content
+run: |
+grep -qi "<html" index.html
+grep -qi "<h1" index.html
+grep -qi "</html>" index.html
+- name: CI Successful
+run: echo "HTML validation passed"
+deploy:
+name: CD - Deploy Website
+needs: test
+runs-on: ubuntu-latest
+environment:
+name: github-pages
+url: ${{ steps.deployment.outputs.page_url }}
+steps:
+- name: Checkout Code
+uses: actions/checkout@v4
+- name: Configure Pages
+uses: actions/configure-pages@v5
+- name: Upload Website
+uses: actions/upload-pages-artifact@v3
+with:
+path: .
+- name: Deploy to GitHub Pages
+id: deployment
+uses: actions/deploy-pages@v4
+Note: The grep commands provide simple content checks, not comprehensive HTML syntax validation. The
+needs: test setting ensures CD runs only if CI succeeds.
+Step 5 - Verify first deployment. Open Actions → HTML CI CD Pipeline → latest run. Confirm both jobs pass.
+Open the published website via Settings → Pages. Its URL typically follows
+https://USERNAME.github.io/html-cicd-demo/.
+6. Main Task: Modify HTML and Redeploy
+Step 6 - Replace index.html with updated content.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Updated DevOps Website</title>
+</head>
+<body>
+<h1>CI/CD Pipeline Successfully Executed</h1>
+<h2>Welcome to GitHub Actions</h2>
+<p>This website was updated automatically
+using GitHub Actions.</p>
+</body>
+</html>
